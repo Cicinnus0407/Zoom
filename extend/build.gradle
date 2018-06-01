@@ -1,0 +1,54 @@
+apply plugin: 'java-library'
+apply plugin: 'maven'
+
+dependencies {
+    compileOnly group: 'android.arch.persistence.room', name: 'runtime', version: '1.1.0'
+//    compileOnly 'androidx.room:room-common:2.0.0-alpha1'
+
+}
+
+//增加maven部署上传
+def MAVEN_LOCAL_PATH = 'http://maven.workmap.net.cn/nexus/content/repositories/releases/'
+def VERSION = '0.0.1'
+def GROUP_ID = 'com.gzkit.mobile'
+def ARTIFACT_ID = 'roomextend'
+def ACCOUNT = 'deployment'
+def PWD = 'FNCKwhat2018@gzkit'
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: MAVEN_LOCAL_PATH) {
+                authentication(userName: ACCOUNT, password: PWD)
+            }
+            pom.groupId = GROUP_ID
+            pom.artifactId = ARTIFACT_ID
+            pom.version = VERSION
+            pom.packaging = 'jar'
+
+
+        }
+    }
+}
+//// 打包源码jar
+//task sourcesJar(type: Jar) {
+//    from sourceSets.main.java.srcDirs
+//    classifier = 'sources'
+//}
+//
+//task javadoc(type: Javadoc) {
+//    failOnError  false
+//    source = sourceSets.main.java.sourceFiles
+//    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+//    classpath += configurations.compile
+//}
+//
+//// 打包文档jar
+//task javadocJar(type: Jar, dependsOn: javadoc) {
+//    classifier = 'javadoc'
+//    from javadoc.destinationDir
+//}
+//
+//artifacts {
+//    archives sourcesJar
+//    archives javadocJar
+//}
