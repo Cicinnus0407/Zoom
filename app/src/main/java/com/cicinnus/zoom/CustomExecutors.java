@@ -143,8 +143,12 @@ public class CustomExecutors {
 
 
             UserEntityCondition condition = new UserEntityCondition();
-            condition
-                    .andLikeTo("firstName","first");
+
+
+            condition.createCriteria()
+                    .andLike("firstName", "zh")
+                    .andEqualTo("lastName", "rong");
+
 
             return AppDatabase
                     .getDatabase(App.getInstance())

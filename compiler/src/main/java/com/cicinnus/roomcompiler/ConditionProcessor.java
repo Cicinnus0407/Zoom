@@ -5,7 +5,7 @@ import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 
 import com.cicinnus.roomextend.annototaion.DaoExtend;
-import com.cicinnus.roomextend.entity.QueryCondition;
+import com.cicinnus.roomextend.entity.BaseQueryCondition;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -120,7 +120,7 @@ public class ConditionProcessor extends AbstractProcessor {
             //创建一个类
             TypeSpec typeSpec = TypeSpec.classBuilder(entityName + "Condition")
                     //继承自QueryCondition
-                    .superclass(ClassName.get(QueryCondition.class))
+                    .superclass(ClassName.get(BaseQueryCondition.class))
                     //成员变量
                     .addFields(memberFieledList)
                     //方法
@@ -211,44 +211,36 @@ public class ConditionProcessor extends AbstractProcessor {
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
+                .addCode("this(true);")
                 .addCode("generateProperty();")
                 .build();
 
         methodSpecList.add(constructor);
 
+
+        MethodSpec constructorWithParams = MethodSpec.constructorBuilder()
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(boolean.class, "notNull")
+                .addCode("super(notNull);")
+                .addCode("generateProperty();")
+                .build();
+
+        methodSpecList.add(constructorWithParams);
+
     }
 
 
     private void generateSqlMethod() {
-        String sql = " StringBuilder sqlBuilder = new StringBuilder(\"select * from " + mTableName + " where 1 = 1 \");\n" +
-                "        //拼接匹配查询\n" +
-                "        for (String key : equalsMap.keySet()) {\n" +
-                "            sqlBuilder.append(\" and \")\n" +
-                "                    .append(key)\n" +
-                "                    .append(\" = \")\n" +
-                "                    .append(\"'\")\n" +
-                "                    .append(equalsMap.get(key))\n" +
-                "                    .append(\"'\");\n" +
-                "        }\n" +
-                "        //模糊匹配\n" +
-                "        for (String likeKey : likesMap.keySet()) {\n" +
-                "            sqlBuilder\n" +
-                "                    .append(\" and \")\n" +
-                "                    .append(likeKey)\n" +
-                "                    .append(\"%\")\n" +
-                "                    .append(likesMap.get(likeKey))\n" +
-                "                    .append(\"% \");\n" +
-                "\n" +
-                "        }\n" +
-                "\n" +
-                "\n" +
-                "        return new SimpleSQLiteQuery(sqlBuilder.toString());";
+
+        String preSql = String.format("\"select * from %s where 1=1 \"", mTableName);
+
+        String finalSql = String.format("return new SimpleSQLiteQuery(%s+getSQL());", preSql);
 
 
         //创建一个RawQuery
         ClassName returnType = ClassName.get("android.arch.persistence.db", "SimpleSQLiteQuery");
         MethodSpec methodSpec = MethodSpec.methodBuilder("getQueryCondition")
-                .addCode(sql)
+                .addCode(finalSql)
                 .addModifiers(Modifier.PUBLIC)
                 .returns(returnType)
                 .build();
@@ -261,14 +253,20 @@ public class ConditionProcessor extends AbstractProcessor {
      * 检查参数的方法
      */
     private void generateCheckMethod() {
-        String codeBlock = "if (!propertyToColumnMap.containsKey(property)) {\n" +
-                "            throw new IllegalArgumentException(String.format(\" %s 没有 %s 属性\", \"UserEntity\", property));\n" +
-                "        }";
+        String codeBlock = "" +
+                "if (propertyToColumnMap.containsKey(property)) {\n" +
+                "   return propertyToColumnMap.get(property);\n" +
+                "} else if (notNull) {\n" +
+                "    throw new IllegalArgumentException(String.format(\" %s exclusive't %s property\\n \", \"UserEntity\", property));\n" +
+                "} else {\n" +
+                "    return null;\n" +
+                "}";
 
-        MethodSpec checkMethodSpec = MethodSpec.methodBuilder("checkProperty")
+        MethodSpec checkMethodSpec = MethodSpec.methodBuilder("checkPropertyByAPT")
                 .addModifiers(Modifier.PROTECTED)
                 .addAnnotation(Override.class)
                 .addParameter(String.class, "property")
+                .returns(String.class)
                 .addCode(codeBlock)
                 .build();
         methodSpecList.add(checkMethodSpec);
