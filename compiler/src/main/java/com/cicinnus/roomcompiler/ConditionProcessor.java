@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 
+import com.cicinnus.roomextend.Zoom;
 import com.cicinnus.roomextend.annototaion.DaoExtend;
 import com.cicinnus.roomextend.entity.BaseQueryCondition;
 import com.google.auto.service.AutoService;
@@ -112,7 +113,7 @@ public class ConditionProcessor extends AbstractProcessor {
 
             generateConstructor(element);
             //检查属性是否存在的方法
-            generateCheckMethod();
+            generateCheckMethod(typeElement);
             //创建sql拼接的方法
             generateSqlMethod();
 
@@ -125,7 +126,9 @@ public class ConditionProcessor extends AbstractProcessor {
                     .addFields(memberFieledList)
                     //方法
                     .addMethods(methodSpecList)
+                    .addJavadoc("APT生成的条件查询对象")
                     .build();
+
 
             //生成Java文件
             JavaFile javaFile = JavaFile.builder(getPackageName(typeElement), typeSpec)
@@ -179,7 +182,7 @@ public class ConditionProcessor extends AbstractProcessor {
         StringBuilder codeBuilder = new StringBuilder();
 
         for (String property : params.keySet()) {
-            codeBuilder.append("propertyToColumnMap")
+            codeBuilder.append("mPropertyMap")
                     .append(".put(\"")
                     .append(property)
                     .append("\",\"")
@@ -211,8 +214,8 @@ public class ConditionProcessor extends AbstractProcessor {
 
         MethodSpec constructor = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
-                .addCode("this(true);")
-                .addCode("generateProperty();")
+                .addCode("this(true);\n")
+                .addCode("generateProperty();\n")
                 .build();
 
         methodSpecList.add(constructor);
@@ -221,8 +224,8 @@ public class ConditionProcessor extends AbstractProcessor {
         MethodSpec constructorWithParams = MethodSpec.constructorBuilder()
                 .addModifiers(Modifier.PUBLIC)
                 .addParameter(boolean.class, "notNull")
-                .addCode("super(notNull);")
-                .addCode("generateProperty();")
+                .addCode("super(notNull);\n")
+                .addCode("generateProperty();\n")
                 .build();
 
         methodSpecList.add(constructorWithParams);
@@ -230,19 +233,31 @@ public class ConditionProcessor extends AbstractProcessor {
     }
 
 
+    /**
+     * 创建SQL语句
+     */
     private void generateSqlMethod() {
 
         String preSql = String.format("\"select * from %s where 1=1 \"", mTableName);
 
-        String finalSql = String.format("return new SimpleSQLiteQuery(%s+getSQL());", preSql);
+        String finalSql = String.format("return new SimpleSQLiteQuery(%s+generateConditionSQL());\n", preSql);
 
+        ClassName log = ClassName.get("android.util", "Log");
+        ClassName zoom = ClassName.get(Zoom.class);
 
         //创建一个RawQuery
         ClassName returnType = ClassName.get("android.arch.persistence.db", "SimpleSQLiteQuery");
-        MethodSpec methodSpec = MethodSpec.methodBuilder("getQueryCondition")
-                .addCode(finalSql)
+        MethodSpec methodSpec = MethodSpec.methodBuilder("build")
+                //输出SQL语句
+                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \",\" + preSql + \"+generateConditionSQL())", zoom, log)
+                //拼接SimpleSQLiteQuery
+                .addCode("}\n")
+                //添加代码块
+                .addStatement("$T SQLiteQuery =  new $T($L + generateConditionSQL())", returnType, returnType, preSql)
                 .addModifiers(Modifier.PUBLIC)
+                //返回类型
                 .returns(returnType)
+                .addStatement("return SQLiteQuery")
                 .build();
 
         methodSpecList.add(methodSpec);
@@ -252,15 +267,15 @@ public class ConditionProcessor extends AbstractProcessor {
     /**
      * 检查参数的方法
      */
-    private void generateCheckMethod() {
+    private void generateCheckMethod(TypeElement element) {
         String codeBlock = "" +
-                "if (propertyToColumnMap.containsKey(property)) {\n" +
-                "   return propertyToColumnMap.get(property);\n" +
+                "if (mPropertyMap.containsKey(property)) {\n" +
+                "   return mPropertyMap.get(property);\n" +
                 "} else if (notNull) {\n" +
-                "    throw new IllegalArgumentException(String.format(\" %s exclusive't %s property\\n \", \"UserEntity\", property));\n" +
+                "    throw new IllegalArgumentException(String.format(\" %s exclusive't %s property \", \"" + entityName + "\", property));\n" +
                 "} else {\n" +
                 "    return null;\n" +
-                "}";
+                "}\n";
 
         MethodSpec checkMethodSpec = MethodSpec.methodBuilder("checkPropertyByAPT")
                 .addModifiers(Modifier.PROTECTED)

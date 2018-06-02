@@ -3,8 +3,7 @@ apply plugin: 'maven'
 
 dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
-    implementation 'com.squareup:javapoet:1.11.0'
-//    implementation group: 'com.gzkit.mobile', name: 'roomextend', version: '0.0.1', transitive: true
+    implementation 'com.squareup:javapoet:1.11.1'
     compileOnly 'android.arch.persistence.room:runtime:1.1.0'
 
     api project(':extend')

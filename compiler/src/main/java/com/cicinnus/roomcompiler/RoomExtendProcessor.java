@@ -8,7 +8,7 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.RawQuery;
 
 import com.google.auto.service.AutoService;
-import com.cicinnus.roomextend.ZoomBaseDao;
+import com.cicinnus.roomextend.base.ZoomBaseDao;
 import com.cicinnus.roomextend.annototaion.DaoExtend;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
@@ -378,7 +378,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addMember("value", String.format("\"select count(*) from %s \"", mTableName))
                 .build();
 
-        MethodSpec selectByCondition = MethodSpec.methodBuilder("selectByCondition")
+        MethodSpec selectByCondition = MethodSpec.methodBuilder("count")
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(annotationSpec)
                 .returns(long.class)

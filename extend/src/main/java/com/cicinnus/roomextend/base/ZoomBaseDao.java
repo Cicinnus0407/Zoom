@@ -1,4 +1,4 @@
-package com.cicinnus.roomextend;
+package com.cicinnus.roomextend.base;
 
 
 import android.arch.persistence.room.Delete;
@@ -10,7 +10,6 @@ import java.util.List;
 
 /**
  * Room的基类操作接口
- * <p>
  * <pre>
  * param <T> 泛型参数
  * author cicinnus

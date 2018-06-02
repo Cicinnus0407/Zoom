@@ -153,7 +153,8 @@ public class CustomExecutors {
             return AppDatabase
                     .getDatabase(App.getInstance())
                     .userDao()
-                    .selectByCondition(condition.getQueryCondition());
+
+                    .selectByCondition(condition.build());
         }
 
         @Override
