@@ -122,7 +122,7 @@ public interface UserDao {
 #### 4. Build -> make project .编译项目,自动生成代码
 
 #### 5. 配置数据库类
-```
+```java
 
 @Database(entities = {UserEntity.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
@@ -146,7 +146,7 @@ public abstract class AppDatabase extends RoomDatabase {
 
 #### 6.使用.注意数据库的操作必须在子线程.
 > UserEntityCondition是编译后生成的对象.
-```
+```java
 //插入
 AppDatabase.getDatabase(context)
                     .userDao()
