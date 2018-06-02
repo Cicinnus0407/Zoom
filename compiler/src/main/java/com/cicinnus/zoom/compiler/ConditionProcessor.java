@@ -9,10 +9,8 @@ import com.cicinnus.zoom.extend.annototaion.DaoExtend;
 import com.cicinnus.zoom.extend.entity.BaseQueryCondition;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
-import com.squareup.javapoet.FieldSpec;
 import com.squareup.javapoet.JavaFile;
 import com.squareup.javapoet.MethodSpec;
-import com.squareup.javapoet.TypeName;
 import com.squareup.javapoet.TypeSpec;
 
 import java.io.IOException;
@@ -51,21 +49,13 @@ public class ConditionProcessor extends AbstractProcessor {
      * 方法集合
      */
     private List<MethodSpec> methodSpecList;
-
-    private List<FieldSpec> memberFieledList;
-
     /**
      * 表名
      */
     private String mTableName;
     /**
-     * 主键名
+     * 对象名
      */
-    private String mPrimaryKeyName;
-    /**
-     * 主键类型
-     */
-    private TypeName mPrimaryType;
     private Name entityName;
 
 
@@ -82,7 +72,7 @@ public class ConditionProcessor extends AbstractProcessor {
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
-//获取被RoomExtend注解的元素
+        //获取被RoomExtend注解的元素
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(DaoExtend.class);
 
 
@@ -94,16 +84,13 @@ public class ConditionProcessor extends AbstractProcessor {
             */
             DaoExtend currentAnnotation = element.getAnnotation(DaoExtend.class);
 
-            //获取entity属性,Class在编译期间无法获取准确对象,所以要使用getTypeMirror()
-
 
             methodSpecList = new ArrayList<>();
-            memberFieledList = new ArrayList<>();
 
             try {
                 currentAnnotation.entity();
             } catch (MirroredTypeException mte) {
-
+                //获取entity属性,Class在编译期间无法获取准确对象,所以要使用getTypeMirror()
                 //处理获取到的类对象
                 DeclaredType classTypeMirror = (DeclaredType) mte.getTypeMirror();
                 TypeElement classTypeElement = (TypeElement) classTypeMirror.asElement();
@@ -122,8 +109,6 @@ public class ConditionProcessor extends AbstractProcessor {
             TypeSpec typeSpec = TypeSpec.classBuilder(entityName + "Condition")
                     //继承自QueryCondition
                     .superclass(ClassName.get(BaseQueryCondition.class))
-                    //成员变量
-                    .addFields(memberFieledList)
                     //方法
                     .addMethods(methodSpecList)
                     .addJavadoc("APT生成的条件查询对象")
@@ -250,7 +235,7 @@ public class ConditionProcessor extends AbstractProcessor {
         MethodSpec methodSpec = MethodSpec.methodBuilder("build")
                 .addCode("String conditionSql = generateConditionSQL();\n")
                 //输出SQL语句
-                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \", "+preSql + "+conditionSql)", zoom, log)
+                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \", " + preSql + "+conditionSql)", zoom, log)
                 //拼接SimpleSQLiteQuery
                 .addCode("}\n")
                 //添加代码块

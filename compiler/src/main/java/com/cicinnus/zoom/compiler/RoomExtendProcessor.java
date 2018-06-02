@@ -7,9 +7,9 @@ import android.arch.persistence.room.PrimaryKey;
 import android.arch.persistence.room.Query;
 import android.arch.persistence.room.RawQuery;
 
-import com.google.auto.service.AutoService;
-import com.cicinnus.zoom.extend.base.ZoomBaseDao;
 import com.cicinnus.zoom.extend.annototaion.DaoExtend;
+import com.cicinnus.zoom.extend.base.ZoomBaseDao;
+import com.google.auto.service.AutoService;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;
@@ -63,6 +63,9 @@ public class RoomExtendProcessor extends AbstractProcessor {
      * 主键名称
      */
     private String mPrimaryKeyName;
+    /**
+     * 主键类型
+     */
     private TypeName mPrimaryType;
 
 

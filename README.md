@@ -7,7 +7,7 @@ Zoom是基于Room的功能扩展库.
 
 觉得好的可以点一下star.
 
-如果对库不满意,可以点一下fork
+如果希望对库进行改造,可以点一下fork
 
 #### 关于Zoom
 使用扩展之前必须先对Room的基础使用有了解.
@@ -44,7 +44,7 @@ Zoom是基于Room的功能扩展库.
 
 #### Zoom对象生成Java类名规则
 - 被@DaoExtend注解的接口编译后会生成类名+Extend的对象.
-> 如 UserDao -> UserDaoExtrend
+> 如 UserDao -> UserDaoExtend
 
 - 数据库实体编译后会生成 类名+Condition对象.
 > 如 UserEntity -> UserEntityCondition
@@ -100,4 +100,32 @@ dependencies {
 ```
 
 [简单使用示例](./wiki/simple_tutorial.md)
+
 更多使用方法请查看sample
+
+---
+
+### 参考
+[Mybatis通用Mapper](https://github.com/abel533/Mapper)
+
+[Getting Class values from Annotations in an AnnotationProcessor](https://area-51.blog/2009/02/13/getting-class-values-from-annotations-in-an-annotationprocessor/)
+
+[ANNOTATION PROCESSING 101](http://hannesdorfmann.com/annotation-processing/annotationprocessing101)
+
+
+### License
+```
+Copyright [2018] [r09er zhong]
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
