@@ -2,6 +2,7 @@ package com.cicinnus.roomextend.entity;
 
 /**
  * 条件
+ *
  * @author cicinnus
  * date 2018/6/1
  */
@@ -34,6 +35,10 @@ public class Criterion {
 
     public Criterion(String condition) {
         this(condition, false);
+    }
+
+    public Criterion(String condition, boolean isOr) {
+        this(condition, null, isOr);
     }
 
 
