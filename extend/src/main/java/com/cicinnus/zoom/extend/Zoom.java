@@ -1,6 +1,8 @@
-package com.cicinnus.roomextend;
+package com.cicinnus.zoom.extend;
 
 /**
+ * 全局开关
+ * global setting
  * author cicinnus
  * date 2018/6/2
  */
@@ -14,6 +16,7 @@ public class Zoom {
 
     /**
      * 设置是否显示SQL
+     *
      * @param showSQL
      */
     public static void showSQL(boolean showSQL) {

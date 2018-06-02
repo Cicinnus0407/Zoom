@@ -1,4 +1,4 @@
-package com.cicinnus.roomcompiler;
+package com.cicinnus.zoom.compiler;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Dao;
@@ -8,8 +8,8 @@ import android.arch.persistence.room.Query;
 import android.arch.persistence.room.RawQuery;
 
 import com.google.auto.service.AutoService;
-import com.cicinnus.roomextend.base.ZoomBaseDao;
-import com.cicinnus.roomextend.annototaion.DaoExtend;
+import com.cicinnus.zoom.extend.base.ZoomBaseDao;
+import com.cicinnus.zoom.extend.annototaion.DaoExtend;
 import com.squareup.javapoet.AnnotationSpec;
 import com.squareup.javapoet.ArrayTypeName;
 import com.squareup.javapoet.ClassName;

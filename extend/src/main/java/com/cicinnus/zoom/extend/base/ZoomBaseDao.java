@@ -1,4 +1,4 @@
-package com.cicinnus.roomextend.base;
+package com.cicinnus.zoom.extend.base;
 
 
 import android.arch.persistence.room.Delete;

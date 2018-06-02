@@ -2,7 +2,7 @@ package com.cicinnus.zoom;
 
 import android.arch.persistence.room.Query;
 
-import com.cicinnus.roomextend.annototaion.DaoExtend;
+import com.cicinnus.zoom.extend.annototaion.DaoExtend;
 
 import java.util.List;
 

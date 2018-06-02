@@ -3,7 +3,7 @@ apply plugin: 'com.android.application'
 android {
     compileSdkVersion 26
     defaultConfig {
-        applicationId "cicinnus.com.zoom"
+        applicationId "com.cicinnus.zoom"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1

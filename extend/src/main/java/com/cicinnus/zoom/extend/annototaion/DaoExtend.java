@@ -1,4 +1,4 @@
-package com.cicinnus.roomextend.annototaion;
+package com.cicinnus.zoom.extend.annototaion;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

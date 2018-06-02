@@ -1,5 +1,6 @@
 apply plugin: 'java-library'
-apply plugin: 'maven'
+apply plugin: 'com.novoda.bintray-release'
+
 
 dependencies {
     implementation 'com.google.auto.service:auto-service:1.0-rc3'
@@ -9,25 +10,19 @@ dependencies {
     api project(':extend')
 }
 
-//增加maven部署上传
-def MAVEN_LOCAL_PATH = 'http://maven.workmap.net.cn/nexus/content/repositories/releases/'
-def VERSION = '0.0.3'
-def GROUP_ID = 'com.gzkit.mobile'
-def ARTIFACT_ID = 'roomcompiler'
-def ACCOUNT = 'deployment'
-def PWD = 'FNCKwhat2018@gzkit'
-uploadArchives {
-    repositories {
-        mavenDeployer {
-            repository(url: MAVEN_LOCAL_PATH) {
-                authentication(userName: ACCOUNT, password: PWD)
-            }
-            pom.groupId = GROUP_ID
-            pom.artifactId = ARTIFACT_ID
-            pom.version = VERSION
-            pom.packaging = 'jar'
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+def user = properties.getProperty('user')
+def group = properties.getProperty('groupId')
+def libVersion = properties.getProperty('libVersion')
+def siteUrl = properties.getProperty('siteUrl')
 
-
-        }
-    }
+publish {
+    repoName = "Zoom"
+    userOrg = user
+    groupId = group
+    artifactId = 'compiler'
+    publishVersion = libVersion
+    desc = 'Room extend'
+    website = siteUrl
 }

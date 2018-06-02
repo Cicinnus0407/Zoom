@@ -1,4 +1,4 @@
-package com.cicinnus.roomextend.entity;
+package com.cicinnus.zoom.extend.entity;
 
 /**
  * 条件

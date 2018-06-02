@@ -1,4 +1,4 @@
-package com.cicinnus.roomextend.entity;
+package com.cicinnus.zoom.extend.entity;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -75,7 +75,6 @@ public abstract class BaseQueryCondition {
                     .append(criterion.getCondition())
                     .append(criterion.getValue());
         }
-        System.out.println("======" + sqlBuilder.toString() + "");
         return sqlBuilder.toString();
 
     }

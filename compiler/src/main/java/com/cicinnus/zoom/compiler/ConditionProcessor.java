@@ -1,12 +1,12 @@
-package com.cicinnus.roomcompiler;
+package com.cicinnus.zoom.compiler;
 
 import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 
-import com.cicinnus.roomextend.Zoom;
-import com.cicinnus.roomextend.annototaion.DaoExtend;
-import com.cicinnus.roomextend.entity.BaseQueryCondition;
+import com.cicinnus.zoom.extend.Zoom;
+import com.cicinnus.zoom.extend.annototaion.DaoExtend;
+import com.cicinnus.zoom.extend.entity.BaseQueryCondition;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.FieldSpec;
@@ -248,12 +248,13 @@ public class ConditionProcessor extends AbstractProcessor {
         //创建一个RawQuery
         ClassName returnType = ClassName.get("android.arch.persistence.db", "SimpleSQLiteQuery");
         MethodSpec methodSpec = MethodSpec.methodBuilder("build")
+                .addCode("String conditionSql = generateConditionSQL();\n")
                 //输出SQL语句
-                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \",\" + preSql + \"+generateConditionSQL())", zoom, log)
+                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \", "+preSql + "+conditionSql)", zoom, log)
                 //拼接SimpleSQLiteQuery
                 .addCode("}\n")
                 //添加代码块
-                .addStatement("$T SQLiteQuery =  new $T($L + generateConditionSQL())", returnType, returnType, preSql)
+                .addStatement("$T SQLiteQuery =  new $T($L + conditionSql)", returnType, returnType, preSql)
                 .addModifiers(Modifier.PUBLIC)
                 //返回类型
                 .returns(returnType)
