@@ -12,7 +12,7 @@ import android.content.Context;
  * @author cicinnus
  * @date 2018/5/13
  */
-@Database(entities = {UserEntity.class}, version = 1, exportSchema = false)
+@Database(entities = {UserEntity.class}, version = 1)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase sInstance;

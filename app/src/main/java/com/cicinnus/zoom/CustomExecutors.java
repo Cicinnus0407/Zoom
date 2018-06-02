@@ -150,11 +150,11 @@ public class CustomExecutors {
                     .andEqualTo("lastName", "rong");
 
 
-            return AppDatabase
+            List<UserEntity> userEntities = AppDatabase
                     .getDatabase(App.getInstance())
                     .userDao()
-
                     .selectByCondition(condition.build());
+            return userEntities;
         }
 
         @Override

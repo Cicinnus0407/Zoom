@@ -1,4 +1,4 @@
-### Zoom
+### Zoom [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/compiler/images/download.svg?version=1.0.2) ](https://bintray.com/cicinnus0407/Zoom/compiler/1.0.2/link)
 
 Extend lib for Google persistence library [Room]()
 
