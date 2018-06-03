@@ -1,13 +1,40 @@
-package com.cicinnus.zoom;
+package com.cicinnus.zoom.ui;
 
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.View;
 
-public class MainActivity extends AppCompatActivity {
+import com.cicinnus.zoom.R;
+import com.cicinnus.zoom.base.BaseActivity;
+
+/**
+ * 主入口Activity
+ *
+ * @author cicinnus
+ * @date 2018/6/2
+ */
+public class MainActivity extends BaseActivity {
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected int getLayoutId() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected void initViewAndData(Bundle savedInstanceState) {
+
+    }
+
+    public void BasicCRUDActivity(View view) {
+        openActivity(BasicCRUDActivity.class);
+    }
+
+
+    public void SelectByPageAndRows(View view) {
+        openActivity(SelectByPageAndRowsActivity.class);
+    }
+
+    public void conditionSearch(View view) {
+        openActivity(SelectByConditionActivity.class);
     }
 }

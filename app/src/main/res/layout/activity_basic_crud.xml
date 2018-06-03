@@ -4,48 +4,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="数据库操作" />
-
 
     <EditText
         android:id="@+id/et_first_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="first_name" />
 
     <EditText
         android:id="@+id/et_last_name"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:hint="last_name" />
 
     <EditText
         android:id="@+id/et_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="ID" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-
-        <EditText
-            android:id="@+id/et_page"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="页数"
-            android:inputType="number" />
-
-        <EditText
-            android:id="@+id/et_rows"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:hint="条数"
-            android:inputType="number" />
-
-    </LinearLayout>
 
     <LinearLayout
 
@@ -81,17 +57,6 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:onClick="selectByPageAndRows"
-            android:text="分页查询" />
-
-    </LinearLayout>
 
     <TextView
         android:id="@+id/tv_content"

@@ -10,7 +10,7 @@ dependencies {
 Properties properties = new Properties()
 properties.load(project.rootProject.file('local.properties').newDataInputStream())
 def user = properties.getProperty('user')
-def group = properties.getProperty('groupId')
+def group = properties.getProperty('group')
 def libVersion = properties.getProperty('libVersion')
 def siteUrl = properties.getProperty('siteUrl')
 publish {

@@ -51,7 +51,7 @@ public class Criterion {
     }
 
     public Object getValue() {
-        return value;
+        return value == null ? "" : value;
     }
 
     public String getAndOr() {

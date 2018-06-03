@@ -1,4 +1,4 @@
-package com.cicinnus.zoom;
+package com.cicinnus.zoom.dao;
 
 import com.cicinnus.zoom.entity.UserEntity;
 import com.cicinnus.zoom.extend.annototaion.DaoExtend;

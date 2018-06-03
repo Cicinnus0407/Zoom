@@ -83,16 +83,9 @@ dependencies {
 }
 ```
 
-#### 2.添加Zoom的仓库地址.添加Zoom依赖(JCenter还未审核通过,所以需要手动指定仓库地址)
+#### 2.添加Zoom的仓库地址.添加Zoom依赖
 **latest-version** 是库的最新版本,请看标题的版本提示.
 ```groovy
-repositories {
-    maven {
-        url  "https://dl.bintray.com/cicinnus0407/Zoom"
-    }
-}
-```
-```
 dependencies {
     api 'com.cicinnus.zoom:extend:latest-version'
     annotationProcessor 'com.cicinnus.zoom:compiler:latest-version'

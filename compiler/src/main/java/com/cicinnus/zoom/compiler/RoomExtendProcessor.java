@@ -137,6 +137,8 @@ public class RoomExtendProcessor extends AbstractProcessor {
             generateSelectOneById(realTypeName);
             //通过id删除
             generateDeleteById();
+            //删除所有
+            generateDeleteAll();
             //通过id集合获取实体列表
             generateSelectByIds(realTypeName);
             //分页
@@ -177,6 +179,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
         }
         return false;
     }
+
 
     /**
      * 获取实体类对象
@@ -310,6 +313,24 @@ public class RoomExtendProcessor extends AbstractProcessor {
     }
 
     /**
+     * 删除所有数据
+     */
+    private void generateDeleteAll() {
+        AnnotationSpec annotationSpec = AnnotationSpec.builder(Query.class)
+                .addMember("value", String.format("\"delete from %s \"", mTableName))
+                .build();
+        //deleteById,参数类型为long
+        MethodSpec deleteAll = MethodSpec.methodBuilder("deleteAll")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addAnnotation(annotationSpec)
+                .returns(int.class)
+                .addJavadoc("删除所有表数据")
+                .build();
+        methodSpecList.add(deleteAll);
+    }
+
+
+    /**
      * 获取分页条数和页数
      *
      * @param realTypeName
@@ -341,7 +362,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
 
 
     /**
-     * 手动写sql
+     * 条件搜索
      *
      * @param realTypeName
      * @param element

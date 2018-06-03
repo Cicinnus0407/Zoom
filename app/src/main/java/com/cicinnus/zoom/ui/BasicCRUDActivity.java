@@ -1,12 +1,12 @@
 package com.cicinnus.zoom.ui;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
 import com.cicinnus.zoom.AppDatabase;
-import com.cicinnus.zoom.CustomExecutors;
 import com.cicinnus.zoom.R;
 import com.cicinnus.zoom.ToastUtil;
 import com.cicinnus.zoom.base.BaseActivity;
@@ -25,10 +25,10 @@ import io.reactivex.observers.DefaultObserver;
  * author cicinnus
  * date 2018/6/12
  */
-public class RoomTestActivity extends BaseActivity {
+public class BasicCRUDActivity extends BaseActivity {
 
 
-    private static final String TAG = RoomTestActivity.class.getSimpleName();
+    private static final String TAG = BasicCRUDActivity.class.getSimpleName();
 
     /**
      * 姓
@@ -51,7 +51,7 @@ public class RoomTestActivity extends BaseActivity {
     /**
      * 输出内容
      */
-    TextView mTvContext;
+    TextView mTvContent;
 
 
     @Override
@@ -64,7 +64,7 @@ public class RoomTestActivity extends BaseActivity {
         etFirstName = findViewById(R.id.et_first_name);
         etLastName = findViewById(R.id.et_last_name);
         etId = findViewById(R.id.et_id);
-        mTvContext = findViewById(R.id.tv_content);
+        mTvContent = findViewById(R.id.tv_content);
     }
 
     /**
@@ -76,13 +76,33 @@ public class RoomTestActivity extends BaseActivity {
         UserEntity userEntity = new UserEntity();
         userEntity.setFirstName(etFirstName.getText().toString());
         userEntity.setLastName(etLastName.getText().toString());
+        Observable.just(userEntity)
+                .map(new Function<UserEntity, Long>() {
+                    @Override
+                    public Long apply(UserEntity userEntity) throws Exception {
+                        return AppDatabase
+                                .getDatabase(mContext)
+                                .userDao()
+                                .insert(userEntity);
+                    }
+                })
+                .compose(CustomScheculers.<Long>iO2Main())
+                .subscribe(new DefaultObserver<Long>() {
+                    @Override
+                    public void onNext(Long aLong) {
+                        ToastUtil.showShort("插入成功,当前rowId:" + aLong);
+                    }
 
-        CustomExecutors.insert(userEntity, new CustomExecutors.AddTask.OnInsertListener() {
-            @Override
-            public void onFinish(Long rowId) {
-                ToastUtil.showShort("插入成功" + rowId);
-            }
-        });
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
     }
 
 
@@ -92,16 +112,38 @@ public class RoomTestActivity extends BaseActivity {
      * @param view
      */
     public void queryOne(View view) {
-        String id = etId.getText().toString();
-        CustomExecutors.selectOne(Integer.parseInt(id), new CustomExecutors.SelectOneTask.OnSelectOneListener() {
-            @Override
-            public void onFinish(UserEntity userEntity) {
-                //查询数据有可能为空
-                if (userEntity != null) {
-                    mTvContext.setText(userEntity.toString());
-                }
-            }
-        });
+        int id = Integer.parseInt(etId.getText().toString());
+        Observable.just(id)
+                .map(new Function<Integer, UserEntity>() {
+                    @Override
+                    public UserEntity apply(Integer id) throws Exception {
+                        return AppDatabase
+                                .getDatabase(mContext)
+                                .userDao()
+                                .selectOneById(id);
+                    }
+                })
+                .compose(CustomScheculers.<UserEntity>iO2Main())
+                .subscribe(new DefaultObserver<UserEntity>() {
+                    @Override
+                    public void onNext(UserEntity userEntity) {
+                        if (userEntity != null) {
+                            mTvContent.setText(userEntity.toString());
+                        } else {
+                            ToastUtil.showShort("不存在当前id的数据");
+                        }
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onComplete() {
+
+                    }
+                });
 
     }
 
@@ -111,7 +153,8 @@ public class RoomTestActivity extends BaseActivity {
      * @param view
      */
     public void loadAll(View view) {
-        Observable.empty()
+        Observable
+                .just(view)
                 .map(new Function<Object, List<UserEntity>>() {
                     @Override
                     public List<UserEntity> apply(Object o) throws Exception {
@@ -131,7 +174,7 @@ public class RoomTestActivity extends BaseActivity {
 
                     @Override
                     public void onError(Throwable e) {
-
+                        Log.e(TAG, "onError: " + e.getMessage());
                     }
 
                     @Override
@@ -162,7 +205,7 @@ public class RoomTestActivity extends BaseActivity {
                 .subscribe(new DefaultObserver<Integer>() {
                     @Override
                     public void onNext(Integer integer) {
-                        ToastUtil.showShort("插入成功" + integer);
+                        ToastUtil.showShort("删除成功" + integer);
                     }
 
                     @Override
@@ -189,7 +232,7 @@ public class RoomTestActivity extends BaseActivity {
             builder.append(userEntity.toString())
                     .append("\n");
         }
-        mTvContext.setText(builder.toString());
+        mTvContent.setText(builder.toString());
     }
 
 

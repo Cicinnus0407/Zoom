@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Zoom</string>
+    <string name="btn_basic_crud">基础CRUD操作</string>
+    <string name="btn_select_by_page_rows">分页查询</string>
 </resources>
