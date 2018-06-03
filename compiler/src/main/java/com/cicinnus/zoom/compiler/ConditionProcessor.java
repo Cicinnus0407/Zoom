@@ -111,6 +111,7 @@ public class ConditionProcessor extends AbstractProcessor {
                     .superclass(ClassName.get(BaseQueryCondition.class))
                     //方法
                     .addMethods(methodSpecList)
+                    .addModifiers(Modifier.PUBLIC)
                     .addJavadoc("APT生成的条件查询对象")
                     .build();
 
@@ -136,14 +137,24 @@ public class ConditionProcessor extends AbstractProcessor {
         entityName = typeElement.getSimpleName();
         //获取实体对象
         Entity entity = typeElement.getAnnotation(Entity.class);
+        if (entity == null) {
+            throw new IllegalArgumentException("@DaoExtend注解绑定的实体对象没有@Entity注解");
+        }
         //表名
-        mTableName = entity.tableName();
+        mTableName = typeElement.getSimpleName().toString();
+        if (!entity.tableName().equals("")) {
+            mTableName = entity.tableName();
+        }
         //根据注解生成属性和字段名的匹配Map
         HashMap<String, String> params = new HashMap<>();
 
         for (Element element : typeElement.getEnclosedElements()) {
+            if (element == null) {
+                continue;
+            }
             //只有成员变量才进行判断
             if (element instanceof VariableElement) {
+
                 //属性名
                 String propertyName = element.getSimpleName().toString();
                 //属性名-表列名

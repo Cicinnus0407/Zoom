@@ -168,6 +168,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
             //生成Java文件
             JavaFile javaFile = JavaFile.builder(getPackageName(typeElement), typeSpec)
                     .build();
+
             try {
                 javaFile.writeTo(processingEnv.getFiler());
             } catch (IOException e) {
@@ -184,11 +185,13 @@ public class RoomExtendProcessor extends AbstractProcessor {
 
         //获取实体对象
         Entity entity = typeElement.getAnnotation(Entity.class);
+        if (entity == null) {
+            throw new IllegalArgumentException("@DaoExtend注解绑定的实体对象没有@Entity注解");
+        }
         //表名
-        mTableName = entity.tableName();
-        //没有指定表名,Room默认使用类名
-        if ("".equals(mTableName)) {
-            mTableName = entity.getClass().getSimpleName();
+        mTableName = typeElement.getSimpleName().toString();
+        if (!entity.tableName().equals("")) {
+            mTableName = entity.tableName();
         }
         for (Element element : typeElement.getEnclosedElements()) {
             //被注解标记
@@ -197,9 +200,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
             if (primaryKey != null) {
                 mPrimaryKeyName = element.toString();
 
-                TypeName typeName = ClassName.get(element.asType());
-
-                mPrimaryType = typeName;
+                mPrimaryType = ClassName.get(element.asType());
 
                 //如果同时也有ColumnInfo,则优先使用
                 ColumnInfo columnInfo = element.getAnnotation(ColumnInfo.class);
