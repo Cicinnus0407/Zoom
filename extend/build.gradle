@@ -13,6 +13,7 @@ def user = properties.getProperty('user')
 def group = properties.getProperty('group')
 def libVersion = properties.getProperty('libVersion')
 def siteUrl = properties.getProperty('siteUrl')
+def key = properties.getProperty('apikey')
 publish {
     repoName = "Zoom"
     userOrg = user
@@ -21,4 +22,6 @@ publish {
     publishVersion = libVersion
     desc = 'Room extend'
     website = siteUrl
+    bintrayUser=user
+    bintrayKey=key
 }

@@ -37,9 +37,8 @@ dependencies {
     api 'io.reactivex.rxjava2:rxjava:2.1.12'
     api 'io.reactivex.rxjava2:rxandroid:2.0.2'
     //
-//    api 'com.cicinnus.zoom:extend:1.0.2'
-//    annotationProcessor 'com.cicinnus.zoom:compiler:1.0.2'
-//    implementation files('/Users/cicinnus/Downloads/compiler-1.1.0.jar')
-    api project(':extend')
-    annotationProcessor project(':compiler')
+    api 'com.cicinnus.zoom:extend:1.0.4'
+    annotationProcessor 'com.cicinnus.zoom:compiler:1.0.4'
+//    api project(':extend')
+//    annotationProcessor project(':compiler')
 }
