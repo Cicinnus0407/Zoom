@@ -1,1 +1,1 @@
-include ':app',':compiler',":extend"
+include ':app',':compiler', ':livedata-compiler', ':livedata-extend',":extend"

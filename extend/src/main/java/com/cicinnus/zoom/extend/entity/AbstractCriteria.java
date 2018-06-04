@@ -459,6 +459,61 @@ public abstract class AbstractCriteria {
 
 
     /**
+     * 分页.后续不能继续拼接
+     * paging list . should be the last condition.
+     *
+     * @param page paging page num
+     * @param rows paging rows num
+     */
+    public void limit(int page, int rows) {
+        String limitSql = " limit " + page * rows + "," + rows;
+        addCriterionWithoutConnetSymbol(limitSql);
+    }
+
+    /**
+     * 根据字段倒序
+     * order by properties desc,
+     *
+     * @param properties
+     */
+    public AbstractCriteria orderByDesc(@NonNull String... properties) {
+        StringBuilder orderBuilder = new StringBuilder();
+        for (String property : properties) {
+            orderBuilder.append("'")
+                    .append(checkProperty(property))
+                    .append("'")
+                    .append(",");
+        }
+        String orderToString = orderBuilder.toString();
+        String orderParams = orderToString.substring(0, orderBuilder.length() - 1);
+        String orderSql = " order by " + orderParams + " desc";
+        addCriterionWithoutConnetSymbol(orderSql);
+        return this;
+    }
+
+    /**
+     * 根据字段倒序
+     * order by properties asc,
+     *
+     * @param properties
+     */
+    public AbstractCriteria orderByAsc(@NonNull String... properties) {
+        StringBuilder orderBuilder = new StringBuilder();
+        for (String property : properties) {
+            orderBuilder.append("'")
+                    .append(checkProperty(property))
+                    .append("'")
+                    .append(",");
+        }
+        String orderToString = orderBuilder.toString();
+        String orderParams = orderToString.substring(0, orderBuilder.length() - 1);
+        String orderSql = " order by " + orderParams + "asc";
+        addCriterionWithoutConnetSymbol(orderSql);
+        return this;
+    }
+
+
+    /**
      * 添加一个条件
      * add an 'and' query condition with raw condition
      *
@@ -524,6 +579,19 @@ public abstract class AbstractCriteria {
         criterionList.add(new Criterion(condition, value, true));
     }
 
+    /**
+     * 添加一个没有连接符的语句
+     * add query condition without connect symbol.
+     *
+     * @param condition
+     */
+    protected void addCriterionWithoutConnetSymbol(@NonNull String condition) {
+
+        Criterion criterion = new Criterion(condition);
+        criterion.setNoConnectSymbol(true);
+        criterionList.add(criterion);
+    }
+
 
     /**
      * 检查是否property存在
@@ -545,7 +613,13 @@ public abstract class AbstractCriteria {
         return mPropertyMap.get(property);
     }
 
-    public List<Criterion> getCriterianList() {
+    /**
+     * 查询语句集合
+     * criterion List
+     *
+     * @return
+     */
+    public List<Criterion> getCriterionList() {
         return criterionList;
     }
 }

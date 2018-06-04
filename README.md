@@ -1,4 +1,4 @@
-### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/compiler/images/download.svg?version=1.0.4) ](https://bintray.com/cicinnus0407/Zoom/compiler/1.0.4/link)
+### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/extend/images/download.svg?version=1.0.5) ](https://bintray.com/cicinnus0407/Zoom/extend/1.0.5/link)
 [English DOC](README_EN.md)
 
 Zoom是基于Room的功能扩展库.
@@ -68,9 +68,12 @@ Zoom是基于Room的功能扩展库.
   - andEqulaTo(property,value);
   - andLike(property,value);
   - andIsNotNull(property);
+  - orIsNull();
   - etc...
-- 条件SQL查询
+- 直接SQL查询
   - andCondition(SQL statement);
+  - orCondition(SQL statement);
+- LiveData支持(Coming soon)
 - 简化数据库升级功能(TODO)
 
 ### 引入依赖
