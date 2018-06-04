@@ -98,10 +98,15 @@ public class SelectByConditionActivity extends BaseActivity {
      */
     public void selectByCondition(View view) {
         PersonEntityCondition condition = new PersonEntityCondition();
+        //(age >=10 && age<-20 )||age <5
         condition.createCriteria()
                 //第一个参数为Entity的属性名,并不是数据库表字段
                 .andBetween("age", 10, 20)
                 .orLessThan("age", 5);
+        //排序必须在分页前面或者在最后
+//                .orderByDesc("personId");
+        //分页必须在最后一个条件
+//                .limit(0, 10);
 
         Observable.just(condition)
                 .map(new Function<PersonEntityCondition, List<PersonEntity>>() {

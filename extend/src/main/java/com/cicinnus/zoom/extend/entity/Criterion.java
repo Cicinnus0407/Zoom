@@ -25,6 +25,11 @@ public class Criterion {
      */
     private String andOr;
 
+    /**
+     * 没有连接符
+     */
+    private boolean noConnectSymbol;
+
 
     public Criterion(String condition, Object value, boolean isOr) {
         this.condition = condition;
@@ -60,5 +65,13 @@ public class Criterion {
 
     public void setAndOr(String andOr) {
         this.andOr = andOr;
+    }
+
+    public boolean isNoConnectSymbol() {
+        return noConnectSymbol;
+    }
+
+    public void setNoConnectSymbol(boolean noConnectSymbol) {
+        this.noConnectSymbol = noConnectSymbol;
     }
 }

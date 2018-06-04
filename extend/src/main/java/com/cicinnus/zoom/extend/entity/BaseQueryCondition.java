@@ -70,8 +70,8 @@ public abstract class BaseQueryCondition {
 
         StringBuilder sqlBuilder = new StringBuilder();
 
-        for (Criterion criterion : mCriteria.getCriterianList()) {
-            sqlBuilder.append(criterion.getAndOr())
+        for (Criterion criterion : mCriteria.getCriterionList()) {
+            sqlBuilder.append(criterion.isNoConnectSymbol() ? "" : criterion.getAndOr())
                     .append(criterion.getCondition())
                     .append(criterion.getValue());
         }
