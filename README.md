@@ -1,4 +1,4 @@
-### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/extend/images/download.svg?version=1.0.5) ](https://bintray.com/cicinnus0407/Zoom/extend/1.0.5/link)
+### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/extend/images/download.svg?version=1.0.6) ](https://bintray.com/cicinnus0407/Zoom/extend/1.0.6/link)
 [English DOC](README_EN.md)
 
 Zoom是基于Room的功能扩展库.
