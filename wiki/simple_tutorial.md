@@ -11,13 +11,7 @@ dependencies {
 
 #### 2.添加Zoom的仓库地址.添加Zoom依赖
 **latest-version** 是库的最新版本,请看标题的版本提示.
-```groovy
-repositories {
-    maven {
-        url  "https://dl.bintray.com/cicinnus0407/Zoom"
-    }
-}
-```
+
 ```
 dependencies {
     api 'com.cicinnus.zoom:extend:latest-version'
@@ -96,7 +90,8 @@ UserEntityCondition condition = new UserEntityCondition();
 
 condition.createCriteria()
         .andLike("firstName", "zh")
-        .andEqualTo("lastName", "rong");
+        .andEqualTo("lastName", "rong")
+        .limit(0,10);
 
 List<UserEntity> userEntities = AppDatabase
                     .getDatabase(App.getInstance())

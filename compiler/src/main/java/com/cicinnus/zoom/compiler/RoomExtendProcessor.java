@@ -146,7 +146,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
             //手动sql
             generateCondition(realTypeName, element);
             //条数
-            generateCount(realTypeName);
+            generateCount();
 
 
             //基类接口,拥有基础的insert,delete,update方法
@@ -239,6 +239,22 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addJavadoc("查询所有实体集合")
                 .build();
         methodSpecList.add(queryAll);
+
+
+        //LiveData
+        ClassName liveData = ClassName.get("android.arch.lifecycle", "LiveData");
+
+        //泛型参数
+        TypeName liveDataResult = ParameterizedTypeName.get(liveData, resultList);
+        //泛型参数
+        MethodSpec queryAllAsLiveData = MethodSpec.methodBuilder("selectAllAsLiveData")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addAnnotation(annotationSpec)
+                .returns(liveDataResult)
+                .addJavadoc("查询所有实体集合")
+                .build();
+        methodSpecList.add(queryAllAsLiveData);
+
     }
 
     /**
@@ -260,6 +276,21 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addJavadoc("通过主键搜索单个实体")
                 .build();
         methodSpecList.add(selectOneByLongId);
+
+        ClassName liveData = ClassName.get("android.arch.lifecycle", "LiveData");
+        //泛型参数
+        TypeName liveDataResult = ParameterizedTypeName.get(liveData, realTypeName);
+
+        //创建selectOne方法,参数类型为long
+        MethodSpec selectOneByIdAsLiveData = MethodSpec.methodBuilder("selectOneByIdAsLiveData")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameter(mPrimaryType, "id")
+                .addAnnotation(annotationSpec)
+                .returns(liveDataResult)
+                .addJavadoc("通过主键搜索单个实体")
+                .build();
+        methodSpecList.add(selectOneByIdAsLiveData);
+
 
     }
 
@@ -288,6 +319,20 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addJavadoc("根据id集合,返回实体集合")
                 .build();
         methodSpecList.add(selectOneByIds);
+
+
+        ClassName liveData = ClassName.get("android.arch.lifecycle", "LiveData");
+        //泛型参数
+        TypeName liveDataResult = ParameterizedTypeName.get(liveData, resultList);
+
+        MethodSpec selectOneByIdsAsLiveData = MethodSpec.methodBuilder("selectOneByIdsAsLiveData")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameter(arrayTypeName, "ids")
+                .addAnnotation(annotationSpec)
+                .returns(liveDataResult)
+                .addJavadoc("根据id集合,返回实体集合")
+                .build();
+        methodSpecList.add(selectOneByIdsAsLiveData);
 
 
     }
@@ -358,6 +403,23 @@ public class RoomExtendProcessor extends AbstractProcessor {
 
         methodSpecList.add(selectByPageRows);
 
+        ClassName liveData = ClassName.get("android.arch.lifecycle", "LiveData");
+        //泛型参数
+        TypeName liveDataResult = ParameterizedTypeName.get(liveData, resultList);
+
+        MethodSpec selectByPageRowsAsLiveData = MethodSpec.methodBuilder("selectByPageRowsAsLiveData")
+                .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
+                .addParameter(int.class, "page")
+                .addParameter(int.class, "rows")
+                .addAnnotation(annotationSpec)
+                .returns(liveDataResult)
+                .addJavadoc("分页查询,page从0开始,rows是分页的条数\n" +
+                        "如果是查询0-5条,则是page=0,rows=5\n" +
+                        "查询第6-10条,则是page=1,rows5.如此类推")
+                .build();
+
+        methodSpecList.add(selectByPageRowsAsLiveData);
+
     }
 
 
@@ -388,6 +450,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addParameter(paramType, "query")
                 .addAnnotation(annotationSpec)
                 .returns(resultList)
+                .addJavadoc("条件搜索")
                 .build();
         methodSpecList.add(selectByCondition);
     }
@@ -395,10 +458,8 @@ public class RoomExtendProcessor extends AbstractProcessor {
 
     /**
      * 获取条数
-     *
-     * @param realTypeName
      */
-    private void generateCount(TypeName realTypeName) {
+    private void generateCount() {
         AnnotationSpec annotationSpec = AnnotationSpec.builder(Query.class)
                 .addMember("value", String.format("\"select count(*) from %s \"", mTableName))
                 .build();
@@ -407,6 +468,7 @@ public class RoomExtendProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC, Modifier.ABSTRACT)
                 .addAnnotation(annotationSpec)
                 .returns(long.class)
+                .addJavadoc("获取单表的数据总数")
                 .build();
         methodSpecList.add(selectByCondition);
     }

@@ -1,5 +1,6 @@
 package com.cicinnus.zoom.ui;
 
+import android.arch.lifecycle.ComputableLiveData;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -11,6 +12,7 @@ import com.cicinnus.zoom.ToastUtil;
 import com.cicinnus.zoom.base.BaseActivity;
 import com.cicinnus.zoom.dao.PersonEntityCondition;
 import com.cicinnus.zoom.entity.PersonEntity;
+import com.cicinnus.zoom.entity.UserEntity;
 import com.cicinnus.zoom.util.CustomScheculers;
 
 import java.util.ArrayList;
@@ -107,6 +109,7 @@ public class SelectByConditionActivity extends BaseActivity {
 //                .orderByDesc("personId");
         //分页必须在最后一个条件
 //                .limit(0, 10);
+
 
         Observable.just(condition)
                 .map(new Function<PersonEntityCondition, List<PersonEntity>>() {
