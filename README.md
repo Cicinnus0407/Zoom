@@ -73,7 +73,7 @@ Zoom是基于Room的功能扩展库.
 - 直接SQL查询
   - andCondition(SQL statement);
   - orCondition(SQL statement);
-- LiveData支持(Coming soon)
+- LiveData支持
 - 简化数据库升级功能(TODO)
 
 ### 引入依赖
