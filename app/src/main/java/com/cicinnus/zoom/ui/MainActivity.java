@@ -37,4 +37,8 @@ public class MainActivity extends BaseActivity {
     public void conditionSearch(View view) {
         openActivity(SelectByConditionActivity.class);
     }
+
+    public void livedataSearch(View view) {
+        openActivity(LiveDataSampleActivity.class);
+    }
 }
