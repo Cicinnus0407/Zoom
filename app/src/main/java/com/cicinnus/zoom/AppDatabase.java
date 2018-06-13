@@ -1,17 +1,16 @@
 package com.cicinnus.zoom;
 
-import android.arch.persistence.db.SupportSQLiteDatabase;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
-import android.arch.persistence.room.migration.Migration;
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.cicinnus.zoom.dao.PersonDaoExtend;
 import com.cicinnus.zoom.dao.UserDaoExtend;
 import com.cicinnus.zoom.entity.PersonEntity;
+import com.cicinnus.zoom.entity.TestEntity;
 import com.cicinnus.zoom.entity.UserEntity;
+import com.cicinnus.zoom.util.UpgradeDataBase;
 
 
 /**
@@ -20,7 +19,8 @@ import com.cicinnus.zoom.entity.UserEntity;
  * @author cicinnus
  * @date 2018/5/13
  */
-@Database(entities = {UserEntity.class, PersonEntity.class}, version = 2, exportSchema = true)
+@Database(entities = {UserEntity.class, PersonEntity.class, TestEntity.class}
+        , version = 4, exportSchema = true)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase sInstance;
@@ -31,7 +31,7 @@ public abstract class AppDatabase extends RoomDatabase {
             synchronized (AppDatabase.class) {
                 if (sInstance == null) {
                     sInstance = Room.databaseBuilder(context, AppDatabase.class, "db-test.db")
-                            .addMigrations(MIGRATION_1_2)
+                            .addMigrations(UpgradeDataBase.migrations())
                             .build();
                 }
             }
@@ -42,14 +42,6 @@ public abstract class AppDatabase extends RoomDatabase {
     public static void onDestroy() {
         sInstance = null;
     }
-
-    public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
-        @Override
-        public void migrate(@NonNull SupportSQLiteDatabase database) {
-            database.execSQL("CREATE TABLE IF NOT EXISTS `PersonEntity` (`id` TEXT NOT NULL, `name` TEXT, `person_age` INTEGER NOT NULL, PRIMARY KEY(`id`))");
-        }
-    };
-
 
     public abstract UserDaoExtend userDao();
 

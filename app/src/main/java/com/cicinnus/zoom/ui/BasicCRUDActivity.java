@@ -112,6 +112,9 @@ public class BasicCRUDActivity extends BaseActivity {
      * @param view
      */
     public void queryOne(View view) {
+        if (etId.getText().length()==0) {
+            return;
+        }
         int id = Integer.parseInt(etId.getText().toString());
         Observable.just(id)
                 .map(new Function<Integer, UserEntity>() {

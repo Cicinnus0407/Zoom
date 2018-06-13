@@ -20,6 +20,9 @@ public class UserEntity {
     @ColumnInfo(name = "last_name")
     private String lastName;
 
+
+    private Long phone;
+
     public int getId() {
         return id;
     }
@@ -51,5 +54,13 @@ public class UserEntity {
                 ", firstName='" + firstName + '\'' +
                 ", lastName='" + lastName + '\'' +
                 '}';
+    }
+
+    public Long getPhone() {
+        return phone;
+    }
+
+    public void setPhone(Long phone) {
+        this.phone = phone;
     }
 }
