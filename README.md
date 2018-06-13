@@ -74,10 +74,10 @@ Zoom是基于Room的功能扩展库.
   - andCondition(SQL statement);
   - orCondition(SQL statement);
 - LiveData支持
-- 简化数据库升级功能(Coming soon)
-- Kotlin支持(Planning)
-- RxJaca2支持(Planning)
-- AndroidX(undetermined)
+- 简化数据库升级功能 (Coming soon)
+- Kotlin支持 (Planning)
+- RxJava2支持 (Planning)
+- AndroidX (undetermined)
 
 ### 引入依赖
 
