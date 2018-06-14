@@ -6,7 +6,7 @@ import android.support.annotation.Nullable;
 import android.view.View;
 import android.widget.TextView;
 
-import com.cicinnus.zoom.AppDatabase;
+import com.cicinnus.zoom.db.AppDatabase;
 import com.cicinnus.zoom.R;
 import com.cicinnus.zoom.base.BaseActivity;
 import com.cicinnus.zoom.entity.UserEntity;

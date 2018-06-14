@@ -17,11 +17,11 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.SOURCE)
 public @interface Upgrade {
     /**
-     * 数据Schema位置
+     * 数据库版本,与@DataBase中的version一致
      *
      * @return
      */
-    String schemasLocation();
+    int dataBaseVersion();
 
     /**
      * 需要升级的类

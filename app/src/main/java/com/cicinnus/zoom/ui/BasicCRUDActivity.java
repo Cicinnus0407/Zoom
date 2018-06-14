@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import com.cicinnus.zoom.AppDatabase;
+import com.cicinnus.zoom.db.AppDatabase;
 import com.cicinnus.zoom.R;
 import com.cicinnus.zoom.ToastUtil;
 import com.cicinnus.zoom.base.BaseActivity;

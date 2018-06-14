@@ -7,9 +7,6 @@ import android.support.annotation.NonNull;
 import com.cicinnus.zoom.entity.UserEntity;
 import com.cicinnus.zoom.extend.annototaion.Upgrade;
 
-import java.util.ArrayList;
-import java.util.List;
-
 /**
  * <pre>
  * author cicinnus
@@ -18,13 +15,13 @@ import java.util.List;
  */
 public class UpgradeDataBase {
 
-    @Upgrade(schemasLocation = "app/schemas/com.cicinnus.zoom.AppDatabase/3.json", upgradeEntities = {})
-    public static class MIGRATE_2_3 {
-        public static final Migration MIGRATION_2_3 = new Migration(2, 3) {
+    @Upgrade(dataBaseVersion = 2, upgradeEntities = {UserEntity.class})
+    public static class MIGRATE_1_2 {
+        public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
             @Override
             public void migrate(@NonNull SupportSQLiteDatabase database) {
                 try {
-                    MigrationHelper_3.getInstance().migrate(database);
+//                    MigrationHelper_2.getInstance().migrate(database);
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
@@ -32,17 +29,17 @@ public class UpgradeDataBase {
         };
     }
 
-    @Upgrade(schemasLocation = "app/schemas/com.cicinnus.zoom.AppDatabase/4.json", upgradeEntities = {UserEntity.class})
-    public static class MIGRATE_3_4 {
-        public static final Migration MIGRATION_3_4 = new Migration(3, 4) {
-            @Override
-            public void migrate(@NonNull SupportSQLiteDatabase database) {
-                MigrationHelper_4.getInstance().migrate(database);
-            }
-        };
-    }
+//    @Upgrade(schemasLocation = "app/schemas/com.cicinnus.zoom.db.AppDatabase/4.json", upgradeEntities = {UserEntity.class})
+//    public static class MIGRATE_3_4 {
+//        public static final Migration MIGRATION_3_4 = new Migration(3, 4) {
+//            @Override
+//            public void migrate(@NonNull SupportSQLiteDatabase database) {
+//                MigrationHelper_4.getInstance().migrate(database);
+//            }
+//        };
+//    }
 
-    public static Migration[] migrations(){
-        return new Migration[]{MIGRATE_2_3.MIGRATION_2_3,MIGRATE_3_4.MIGRATION_3_4};
+    public static Migration[] migrations() {
+        return new Migration[]{MIGRATE_1_2.MIGRATION_1_2};
     }
 }

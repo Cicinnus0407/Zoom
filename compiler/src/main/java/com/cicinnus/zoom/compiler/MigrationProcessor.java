@@ -1,9 +1,12 @@
 package com.cicinnus.zoom.compiler;
 
+import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Entity;
 
+import com.cicinnus.zoom.ext.ZoomNameType;
 import com.cicinnus.zoom.extend.annototaion.Upgrade;
 import com.cicinnus.zoom.extend.helper.UpgradeInfoBean;
+import com.cicinnus.zoom.util.ProperitesUtil;
 import com.cicinnus.zoom.util.SQLUtil;
 import com.google.auto.common.MoreElements;
 import com.google.auto.service.AutoService;
@@ -36,7 +39,6 @@ import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.util.Elements;
@@ -51,9 +53,6 @@ import javax.lang.model.util.Elements;
 @AutoService(Processor.class)
 public class MigrationProcessor extends AbstractProcessor {
 
-
-    private Name entityName;
-
     /**
      * 方法集合
      */
@@ -67,7 +66,8 @@ public class MigrationProcessor extends AbstractProcessor {
 
     private Elements elementUtils;
     private UpgradeInfoBean upgradeInfoBean;
-    private String mTableName;
+    private String location;
+    private String packageName;
 
 
     /**
@@ -79,12 +79,19 @@ public class MigrationProcessor extends AbstractProcessor {
     public synchronized void init(ProcessingEnvironment processingEnv) {
         super.init(processingEnv);
         elementUtils = processingEnv.getElementUtils();
+        Map<String, String> options = processingEnv.getOptions();
+        location = options.get("room.schemaLocation");
     }
 
     @Override
     public boolean process(Set<? extends TypeElement> set, RoundEnvironment roundEnvironment) {
         Set<? extends Element> elements = roundEnvironment.getElementsAnnotatedWith(Upgrade.class);
+        Set<? extends Element> database = roundEnvironment.getElementsAnnotatedWith(Database.class);
 
+        for (Element element : database) {
+            packageName = getPackageName((TypeElement) element);
+            packageName = packageName + "." + element.getSimpleName();
+        }
 
         for (Element element : elements) {
 
@@ -103,17 +110,12 @@ public class MigrationProcessor extends AbstractProcessor {
             migrateFunc();
             //创建临时表
             generateTempTable();
-            //恢复数据
-            restoreData();
             //创建和删除表
-            generateCreateAndDropTable(typeElement, currentAnnotation.schemasLocation());
+            generateTableOperate(typeElement, currentAnnotation.dataBaseVersion());
             //根据表名删除表
             generateDropTableByName();
-
-
-            generateMemberField();
-
-
+            //表重命名
+            generateRenameTable();
             //获取生成的类名
             String className = "MigrationHelper_" + upgradeInfoBean.getDatabase().getVersion();
             //单例
@@ -146,7 +148,7 @@ public class MigrationProcessor extends AbstractProcessor {
     private void createSingleton(TypeElement element, String className) {
         ClassName thisClass = ClassName.get(getPackageName(element), className);
         FieldSpec fieldSpec = FieldSpec.builder(thisClass, "helper", Modifier.PRIVATE, Modifier.STATIC)
-                .initializer("new $T();", thisClass)
+                .initializer("new $T()", thisClass)
                 .addJavadoc("单例对象")
                 .build();
         mFieldSpecList.add(0, fieldSpec);
@@ -155,22 +157,10 @@ public class MigrationProcessor extends AbstractProcessor {
                 .addModifiers(Modifier.PUBLIC, Modifier.STATIC)
                 .returns(thisClass)
                 .addCode("\nreturn helper;\n")
-                .addJavadoc("\n//获取单例升级帮助类")
+                .addJavadoc("\n获取单例升级帮助类")
                 .build();
         methodSpecList.add(0, singleton);
 
-    }
-
-    private void generateMemberField() {
-        ClassName arrayList = ClassName.get("java.util", "ArrayList");
-        ClassName tableInfo = ClassName.get("android.arch.persistence.room.util", "TableInfo");
-
-        TypeName arrayListResult = ParameterizedTypeName.get(arrayList, tableInfo);
-
-        FieldSpec fieldSpec = FieldSpec.builder(arrayListResult, "mTableInfoList", Modifier.PRIVATE)
-                .initializer("new $T()", arrayListResult)
-                .build();
-        mFieldSpecList.add(fieldSpec);
     }
 
     /**
@@ -207,7 +197,7 @@ public class MigrationProcessor extends AbstractProcessor {
                     }
 
                     //表名
-                    mTableName = typeElement.getSimpleName().toString();
+                    String mTableName = typeElement.getSimpleName().toString();
                     if (!entity.tableName().equals("")) {
                         mTableName = entity.tableName();
                     }
@@ -226,24 +216,18 @@ public class MigrationProcessor extends AbstractProcessor {
     }
 
     private void migrateFunc() {
-        ClassName database = ClassName.get("android.arch.persistence.db", "SupportSQLiteDatabase");
 
         MethodSpec migrateFunc = MethodSpec.methodBuilder("migrate")
                 .addModifiers(Modifier.PUBLIC, Modifier.FINAL)
-                .addParameter(database, "database")
+                .addParameter(ZoomNameType.database, "database")
                 .addCode("//创建临时表")
                 .addCode("\nfor(String name : getUpgradeList()){")
                 .addCode("\n\tTableInfo tableInfo = TableInfo.read(database, name);")
-                .addCode("\n\tmTableInfoList.add(tableInfo);")
                 .addCode("\n\tif (tableInfo.columns.size() != 0) {")
-                .addCode("\n\tcreateTempTables(database, tableInfo);")
+                .addCode("\n\tprocessTempTables(database, tableInfo);")
                 .addCode("\n\t}\n}")
                 .addCode("\n//创建表")
                 .addCode("\n\tcreateAllTables(database);")
-                .addCode("\n//恢复数据\n")
-                .addCode("for (TableInfo tableInfo : mTableInfoList) {\n")
-                .addCode("\trestoreData(database,tableInfo);\n")
-                .addCode("}\n")
                 .addJavadoc("具体的操作方法")
                 .build();
         methodSpecList.add(migrateFunc);
@@ -252,84 +236,74 @@ public class MigrationProcessor extends AbstractProcessor {
 
     private void generateTempTable() {
 
-        String codeBlock = "String divider = \"\";\n" +
-                "String tableName = tableInfo.name;\n" +
-                "String tempTableName = tableInfo.name.concat(\"_temp\");\n" +
-                "//拼接创建临时表的SQL\n" +
-                "createTableStringBuilder.append(\"create table \")\n" +
-                "                        .append(tempTableName)\n" +
-                "                        .append(\" ( \");";
-
-        ClassName arrayList = ClassName.get("java.util", "ArrayList");
-
-        //获取DB
-        ClassName database = ClassName.get("android.arch.persistence.db", "SupportSQLiteDatabase");
-        ClassName tableInfo = ClassName.get("android.arch.persistence.room.util", "TableInfo");
-        ClassName textUtils = ClassName.get("android.text", "TextUtils");
+        String codeBlock = "String tableName = tableInfo.name;\n" +
+                "String tempTableName = tableInfo.name.concat(\"_TEMP\");\n";
 
         //创建临时表
-        MethodSpec.Builder createTempTable = MethodSpec.methodBuilder("createTempTables")
-                .addParameter(database, "database")
-                .addParameter(tableInfo, "tableInfo")
-                .addStatement("StringBuilder createTableStringBuilder = new StringBuilder()")
-                .addStatement("ArrayList<String> properties = new $T<>()", arrayList)
+        MethodSpec.Builder createTempTable = MethodSpec.methodBuilder("processTempTables")
+                .addParameter(ZoomNameType.database, "database")
+                .addParameter(ZoomNameType.tableInfo, "tableInfo")
+                .addModifiers(Modifier.PRIVATE)
                 .addCode(codeBlock)
-                .beginControlFlow("\nfor(String key : tableInfo.columns.keySet())")
-                .addStatement("TableInfo.Column column = tableInfo.columns.get(key)")
-                .addStatement("properties.add(column.name)")
-                .addStatement("String type = column.type")
-                .addStatement("createTableStringBuilder.append(divider)\n.append(column.name)\n.append(\" \")\n.append(type)")
-                .addStatement("\nif (column.isPrimaryKey()) {\ncreateTableStringBuilder.append(\" primary key\")")
-                .addCode("}\n")
-                .addStatement("divider = \",\"")
-                .endControlFlow()
-                .addStatement("createTableStringBuilder.append(\");\")")
-                .addStatement("database.execSQL(" + "createTableStringBuilder.toString()" + ")", database);
-
-        //SQL输出
-        SQLUtil.showLog(createTempTable, "\"createTempTable:---\"" + "+createTableStringBuilder.toString()")
-                .addStatement(" String insertTableString = \"insert into \" + tempTableName + \" ( \" +\n" +
-                        "         $T.join(\",\", properties) +\n" +
-                        "         \") select \" +\n" +
-                        "         $T.join(\",\", properties) +\n" +
-                        "         \" from \" + tableName + \";\"", textUtils, textUtils)
-                .addStatement("database.execSQL(" + "insertTableString" + ")", database);
-        //SQL输出
-        SQLUtil.showLog(createTempTable, "\"insertTempTable:---\"" + "+insertTableString")
+                .addCode("//创建临时表\n")
+                .addCode("createTempTableByTableName(database,tableName);\n")
+                .addCode("//向临时表插入数据\n")
+                .addCode("insertIntoTempTable(database,tempTableName);\n")
+                .addCode("//删除原表\n")
                 .addCode("dropTableByName(database, tableName, true);\n")
-                .addJavadoc("创建表");
+                .addCode("//临时表重命名\n")
+                .addCode("renameTable(database,tempTableName,tableName);\n")
+                .addJavadoc("处理临时表");
 
         methodSpecList.add(createTempTable.build());
 
     }
 
-    private void generateCreateAndDropTable(TypeElement typeElement, String schemaLocation) {
-        entityName = typeElement.getSimpleName();
+    private void generateTableOperate(TypeElement typeElement, int version) {
 
         try {
-            File file = new File(schemaLocation);
+            String filePath = location + File.separator + packageName + File.separator + version + ".json";
+            File file = new File(filePath);
             if (!file.exists()) {
-                throw new IllegalArgumentException("请输入正确的Schema文件路径");
+                throw new IllegalArgumentException("没有找到schema的json文件" + filePath + ",请检查配置项");
             }
+
             FileReader fileReader = new FileReader(file);
             Gson gson = new Gson();
             upgradeInfoBean = gson.fromJson(fileReader, UpgradeInfoBean.class);
 
-            //获取DB
-            ClassName database = ClassName.get("android.arch.persistence.db", "SupportSQLiteDatabase");
+
             //创建方法
             MethodSpec.Builder createTable = MethodSpec.methodBuilder("createAllTables")
-                    .addParameter(database, "database")
+                    .addParameter(ZoomNameType.database, "database")
                     .addModifiers(Modifier.PRIVATE)
                     .addJavadoc("创建表");
 
 
             //删除所有表
             MethodSpec.Builder dropTable = MethodSpec.methodBuilder("dropAllTables")
-                    .addParameter(database, "database")
+                    .addParameter(ZoomNameType.database, "database")
                     .addModifiers(Modifier.PRIVATE)
                     .addParameter(boolean.class, "ifExists")
                     .addJavadoc("删除表");
+
+            //创建临时表
+            MethodSpec.Builder tempTable = MethodSpec.methodBuilder("createTempTableByTableName")
+                    .addJavadoc("临时表")
+                    .addParameter(ZoomNameType.database, "database")
+                    .addParameter(String.class, "tableName")
+                    .addModifiers(Modifier.PRIVATE)
+                    .addCode("String sql=\"\";\n")
+                    .addCode("switch(tableName){");
+
+            //插入数据到临时表
+            MethodSpec.Builder insertTempTable = MethodSpec.methodBuilder("insertIntoTempTable")
+                    .addJavadoc("将原数据插入临时表")
+                    .addParameter(ZoomNameType.database, "database")
+                    .addParameter(String.class, "tempTableName")
+                    .addModifiers(Modifier.PRIVATE)
+                    .addCode("String sql=\"\";\n")
+                    .addCode("switch(tempTableName){");
 
 
             for (UpgradeInfoBean.DatabaseBean.EntitiesBean bean : upgradeInfoBean.getDatabase().getEntities()) {
@@ -342,10 +316,48 @@ public class MigrationProcessor extends AbstractProcessor {
                 String dropSQL = "\"DROP TABLE \"+(ifExists ? \"IF EXISTS\"  : \"\") +" + "\"" + bean.getTableName() + "\"";
                 dropTable.addStatement("\t\tdatabase.execSQL(" + dropSQL + ")");
 
+                String tempSQL = "\"" + sql.replace("${TABLE_NAME}", bean.getTableName() + "_TEMP") + "\"";
+                //临时表
+                tempTable
+                        .addCode("\n\t\tcase \"" + bean.getTableName() + "\":\n")
+                        .addStatement("\t\t\tsql=" + tempSQL + "")
+                        .addCode("\t\tbreak;");
+
+                List<String> list = new ArrayList<>();
+                for (UpgradeInfoBean.DatabaseBean.EntitiesBean.FieldsBean fieldsBean : bean.getFields()) {
+                    list.add(fieldsBean.getColumnName());
+                }
+                String properties = ProperitesUtil.join(",", list);
+
+
+                //插入临时表
+                insertTempTable
+                        .addCode("\n\t\tcase \"" + bean.getTableName().concat("_TEMP") + "\":\n")
+                        .addStatement("\t\t\tsql = \"insert into \" + tempTableName + \" ( \" +\n" +
+                                "                 $S +\n" +
+                                "                 \") select \" +\n" +
+                                "                 $S +\n" +
+                                "                 \" from " + bean.getTableName() + " ;\"", properties, properties)
+                        .addCode("\t\tbreak;");
+
             }
+            //临时表结束
+            tempTable
+                    .addCode("\n\t\tdefault:break;\n")
+                    .addCode("\n}")
+                    .addCode("\ndatabase.execSQL(sql);\n");
+            SQLUtil.showLog(tempTable, "\"createTempTable:---\"" + "+sql");
+
+            insertTempTable
+                    .addCode("\n\t\tdefault:break;\n")
+                    .addCode("\n}")
+                    .addCode("database.execSQL(sql);\n");
+            SQLUtil.showLog(insertTempTable, "\"insertIntoTempTable:---\"" + "+sql");
 
             methodSpecList.add(createTable.build());
-            methodSpecList.add(dropTable.build());
+//            methodSpecList.add(dropTable.build());
+            methodSpecList.add(tempTable.build());
+            methodSpecList.add(insertTempTable.build());
 
 
         } catch (FileNotFoundException e) {
@@ -354,15 +366,16 @@ public class MigrationProcessor extends AbstractProcessor {
 
     }
 
+    /**
+     * 根据表名删除
+     */
     private void generateDropTableByName() {
-        ClassName database = ClassName.get("android.arch.persistence.db", "SupportSQLiteDatabase");
-
 
         String dropSQL = "\"DROP TABLE \"+(ifExists ? \"IF EXISTS \"  : \"\") + tableName ";
 
         MethodSpec dropTableByName = MethodSpec.methodBuilder("dropTableByName")
-                .addModifiers(Modifier.PRIVATE)
-                .addParameter(database, "database")
+                .addModifiers(Modifier.PUBLIC)
+                .addParameter(ZoomNameType.database, "database")
                 .addParameter(String.class, "tableName")
                 .addParameter(boolean.class, "ifExists")
                 .addStatement("database.execSQL(" + dropSQL + ")")
@@ -371,18 +384,28 @@ public class MigrationProcessor extends AbstractProcessor {
         methodSpecList.add(dropTableByName);
     }
 
+    private void generateRenameTable() {
+
+        String renameSql = "database.execSQL(\"ALTER TABLE \" + tableName + \" RENAME TO \" + newTableName);\n";
+
+        MethodSpec.Builder renameTable = MethodSpec.methodBuilder("renameTable")
+                .addParameter(ZoomNameType.database, "database")
+                .addParameter(String.class, "tableName")
+                .addParameter(String.class, "newTableName")
+                .addModifiers(Modifier.PUBLIC)
+                .addJavadoc("表重命名")
+                .addCode(renameSql);
+        methodSpecList.add(renameTable.build());
+    }
+
     private void restoreData() {
-        ClassName database = ClassName.get("android.arch.persistence.db", "SupportSQLiteDatabase");
-        ClassName tableInfo = ClassName.get("android.arch.persistence.room.util", "TableInfo");
-        ClassName arrayList = ClassName.get("java.util", "ArrayList");
 
 
         MethodSpec.Builder restoreData = MethodSpec.methodBuilder("restoreData")
-                .addParameter(database, "database")
-                .addParameter(tableInfo, "tableInfo")
+                .addParameter(ZoomNameType.database, "database")
+                .addParameter(ZoomNameType.tableInfo, "tableInfo")
                 .addCode("String tableName = tableInfo.name;\n" +
-                        "String tempTableName = tableInfo.name.concat(\"_temp\");\n")
-                .addStatement("ArrayList<String> properties = new $T<>()", arrayList)
+                        "String tempTableName = tableInfo.name.concat(\"_TEMP\");\n")
                 .beginControlFlow("for (String key : tableInfo.columns.keySet())")
                 .addStatement("\tTableInfo.Column column = tableInfo.columns.get(key)")
                 .addStatement("\tproperties.add(column.name)")

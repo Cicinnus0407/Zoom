@@ -1,4 +1,4 @@
-package com.cicinnus.zoom;
+package com.cicinnus.zoom.db;
 
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
@@ -19,8 +19,8 @@ import com.cicinnus.zoom.util.UpgradeDataBase;
  * @author cicinnus
  * @date 2018/5/13
  */
-@Database(entities = {UserEntity.class, PersonEntity.class, TestEntity.class}
-        , version = 4, exportSchema = true)
+@Database(entities = {UserEntity.class, PersonEntity.class}
+        , version = 2, exportSchema = true)
 public abstract class AppDatabase extends RoomDatabase {
 
     private static AppDatabase sInstance;

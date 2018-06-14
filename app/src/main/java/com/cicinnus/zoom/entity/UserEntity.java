@@ -21,8 +21,6 @@ public class UserEntity {
     private String lastName;
 
 
-    private Long phone;
-
     public int getId() {
         return id;
     }
@@ -56,11 +54,4 @@ public class UserEntity {
                 '}';
     }
 
-    public Long getPhone() {
-        return phone;
-    }
-
-    public void setPhone(Long phone) {
-        this.phone = phone;
-    }
 }

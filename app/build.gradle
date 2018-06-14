@@ -16,9 +16,9 @@ android {
             }
         }
     }
-    sourceSets {
-        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
-    }
+//    sourceSets {
+//        androidTest.assets.srcDirs += files("$projectDir/schemas".toString())
+//    }
     buildTypes {
         release {
             minifyEnabled false
@@ -30,9 +30,8 @@ android {
 }
 
 dependencies {
-    //    implementation fileTree(include: ['*.jar'], dir: 'libs')
+//        implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
-    implementation 'com.android.support.constraint:constraint-layout:1.1.0'
     //ROOM
     api 'android.arch.persistence.room:runtime:1.1.0'
     annotationProcessor 'android.arch.persistence.room:compiler:1.1.0'
@@ -46,11 +45,6 @@ dependencies {
     //    annotationProcessor 'com.cicinnus.zoom:compiler:1.0.4'
     api project(':extend')
     annotationProcessor project(':compiler')
-    implementation 'com.google.code.gson:gson:2.8.5'
-    //    compile group: 'android.arch.persistence.room', name: 'migration', version: '1.1.0'
+    //    compile group: 'android.arch.persistence.room', name: 'migration', dataBaseVersion: '1.1.0'
 
-    androidTestImplementation "android.arch.persistence.room:testing:1.1.0"
-    testImplementation 'junit:junit:4.12'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }
