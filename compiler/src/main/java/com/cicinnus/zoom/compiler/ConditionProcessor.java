@@ -4,9 +4,9 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.Ignore;
 
-import com.cicinnus.zoom.extend.Zoom;
 import com.cicinnus.zoom.extend.annototaion.DaoExtend;
 import com.cicinnus.zoom.extend.entity.BaseQueryCondition;
+import com.cicinnus.zoom.util.SQLUtil;
 import com.google.auto.service.AutoService;
 import com.squareup.javapoet.ClassName;
 import com.squareup.javapoet.JavaFile;
@@ -236,19 +236,14 @@ public class ConditionProcessor extends AbstractProcessor {
 
         String preSql = String.format("\"select * from %s where 1=1 \"", mTableName);
 
-        String finalSql = String.format("return new SimpleSQLiteQuery(%s+generateConditionSQL());\n", preSql);
-
-        ClassName log = ClassName.get("android.util", "Log");
-        ClassName zoom = ClassName.get(Zoom.class);
-
         //创建一个RawQuery
         ClassName returnType = ClassName.get("android.arch.persistence.db", "SimpleSQLiteQuery");
-        MethodSpec methodSpec = MethodSpec.methodBuilder("build")
-                .addCode("String conditionSql = generateConditionSQL();\n")
-                //输出SQL语句
-                .addStatement("if ($T.SHOW_SQL) {\n$T.d(\"Zoom---query SQL: \", " + preSql + "+conditionSql)", zoom, log)
-                //拼接SimpleSQLiteQuery
-                .addCode("}\n")
+        MethodSpec.Builder builder = MethodSpec.methodBuilder("build")
+                .addCode("String conditionSql = generateConditionSQL();\n");
+        //输出SQL语句
+        SQLUtil.showLog(builder, "\"Query SQL: \"+"+preSql + " + conditionSql");
+
+        builder
                 //添加代码块
                 .addStatement("$T SQLiteQuery =  new $T($L + conditionSql)", returnType, returnType, preSql)
                 .addModifiers(Modifier.PUBLIC)
@@ -257,7 +252,7 @@ public class ConditionProcessor extends AbstractProcessor {
                 .addStatement("return SQLiteQuery")
                 .build();
 
-        methodSpecList.add(methodSpec);
+        methodSpecList.add(builder.build());
 
     }
 

@@ -45,6 +45,19 @@ public class PersonEntity {
     @Ignore
     private String ignoreProperty;
 
+    @ColumnInfo(name = "height")
+    private double height;
+
+
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
+    private double weight;
 
     public String getPersonId() {
         return personId;
@@ -86,5 +99,12 @@ public class PersonEntity {
                 "age=" + age +"\n"+
                 "ignoreProperty='" + ignoreProperty + '\'' +"\n"+
                 '}';
+    }
+    public double getHeight() {
+        return height;
+    }
+
+    public void setHeight(double height) {
+        this.height = height;
     }
 }

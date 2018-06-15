@@ -20,6 +20,7 @@ public class UserEntity {
     @ColumnInfo(name = "last_name")
     private String lastName;
 
+
     public int getId() {
         return id;
     }
@@ -52,4 +53,5 @@ public class UserEntity {
                 ", lastName='" + lastName + '\'' +
                 '}';
     }
+
 }
