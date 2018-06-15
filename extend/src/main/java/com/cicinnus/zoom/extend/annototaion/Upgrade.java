@@ -25,8 +25,10 @@ public @interface Upgrade {
 
     /**
      * 需要升级的类
+     *
      * @return
      */
     Class[] upgradeEntities();
+
 
 }

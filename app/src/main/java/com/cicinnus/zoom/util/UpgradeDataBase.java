@@ -20,24 +20,10 @@ public class UpgradeDataBase {
         public static final Migration MIGRATION_1_2 = new Migration(1, 2) {
             @Override
             public void migrate(@NonNull SupportSQLiteDatabase database) {
-                try {
-//                    MigrationHelper_2.getInstance().migrate(database);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
+                MigrationHelper_2.getInstance().migrate(database);
             }
         };
     }
-
-//    @Upgrade(schemasLocation = "app/schemas/com.cicinnus.zoom.db.AppDatabase/4.json", upgradeEntities = {UserEntity.class})
-//    public static class MIGRATE_3_4 {
-//        public static final Migration MIGRATION_3_4 = new Migration(3, 4) {
-//            @Override
-//            public void migrate(@NonNull SupportSQLiteDatabase database) {
-//                MigrationHelper_4.getInstance().migrate(database);
-//            }
-//        };
-//    }
 
     public static Migration[] migrations() {
         return new Migration[]{MIGRATE_1_2.MIGRATION_1_2};

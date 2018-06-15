@@ -227,7 +227,7 @@ public class MigrationProcessor extends AbstractProcessor {
                 .addCode("\n\tprocessTempTables(database, tableInfo);")
                 .addCode("\n\t}\n}")
                 .addCode("\n//创建表")
-                .addCode("\n\tcreateAllTables(database);")
+                .addCode("\ncreateAllTables(database);")
                 .addJavadoc("具体的操作方法")
                 .build();
         methodSpecList.add(migrateFunc);
