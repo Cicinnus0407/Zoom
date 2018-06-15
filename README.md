@@ -1,4 +1,4 @@
-### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/extend/images/download.svg?version=1.0.6) ](https://bintray.com/cicinnus0407/Zoom/extend/1.0.6/link)
+### Zoom  [ ![Download](https://api.bintray.com/packages/cicinnus0407/Zoom/extend/images/download.svg?version=1.0.7) ](https://bintray.com/cicinnus0407/Zoom/extend/1.0.7/link)
 [English DOC](README_EN.md)
 
 Zoom是基于Room的功能扩展库.
@@ -74,7 +74,7 @@ Zoom是基于Room的功能扩展库.
   - andCondition(SQL statement);
   - orCondition(SQL statement);
 - LiveData支持
-- 简化数据库升级功能 (Coming soon)
+- 数据库升级帮助类
 - Kotlin支持 (Planning)
 - RxJava2支持 (Planning)
 - AndroidX (undetermined)
